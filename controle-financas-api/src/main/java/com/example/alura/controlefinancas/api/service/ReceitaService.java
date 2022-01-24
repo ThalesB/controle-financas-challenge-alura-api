@@ -1,15 +1,20 @@
 package com.example.alura.controlefinancas.api.service;
 
+import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.model.Receita;
 import com.example.alura.controlefinancas.api.repository.ReceitaRepository;
 import com.example.alura.controlefinancas.api.service.exception.ReceitaMesmaDescricaoNoMesException;
 import com.example.alura.controlefinancas.api.service.exception.ReceitaNaoExistenteException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -71,4 +76,24 @@ public class ReceitaService {
     }
 
 
+    public Page<Receita> pesquisaPaginada(String descricao, int page, int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return receitaRepository.findByDescricaoPaginada(descricao, pageable);
+    }
+
+    public List<Receita> pesquisar(String descricao) {
+
+        return receitaRepository.findByDescricao(descricao);
+    }
+
+    public List<Receita> pesquisarReceitasNoMes(Integer ano, Integer mes) {
+
+        LocalDate dataDespesaEventual = LocalDate.of(ano,mes,1);
+        LocalDate dataInicio = dataDespesaEventual.withDayOfMonth(1);
+        LocalDate dataFim = dataDespesaEventual.withDayOfMonth(dataDespesaEventual.lengthOfMonth());
+
+        return receitaRepository.findByData(dataInicio, dataFim);
+    }
 }

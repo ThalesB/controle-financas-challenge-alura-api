@@ -33,7 +33,6 @@ public class DespesaFixa {
     @Column(name="observacao", nullable = false)
     private String observacao;
 
-    @NotNull
     @Column(name="tipo_despesa")
     @Enumerated(EnumType.STRING)
     private TipoDespesaEnum tipoDespesa;

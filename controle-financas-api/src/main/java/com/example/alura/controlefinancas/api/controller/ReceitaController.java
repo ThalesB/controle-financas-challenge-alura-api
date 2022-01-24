@@ -2,6 +2,7 @@ package com.example.alura.controlefinancas.api.controller;
 
 import com.example.alura.controlefinancas.api.event.RecursoCriadoEvent;
 import com.example.alura.controlefinancas.api.exceptionhandler.ControleFinancasExceptionHandler;
+import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.model.Receita;
 import com.example.alura.controlefinancas.api.repository.ReceitaRepository;
 import com.example.alura.controlefinancas.api.service.ReceitaService;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,17 +41,33 @@ public class ReceitaController {
     MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<List<Receita>> receitasListar(){
+    @ResponseStatus(HttpStatus.OK)
+    public List<Receita> pesquisar(@RequestParam(value = "descricao", required = false) String descricao){
 
-        List<Receita> receitas = receitaRepository.findAll();
+        return receitaService.pesquisar(descricao);
+    }
 
-        return ResponseEntity.ok(receitas);
+    @GetMapping("/paginada")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<Receita> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao,
+                                   @RequestParam(value = "page", required = false)Integer page,
+                                   @RequestParam(value = "size", required = false) Integer size){
+
+        return receitaService.pesquisaPaginada(descricao, page, size);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Receita> findReceitaById(@PathVariable Long id){
 
         return receitaService.verificaReceitaExistente(id);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public ResponseEntity<List<Receita>> listagemReceitaNoMes(@PathVariable Integer ano, @PathVariable Integer mes){
+
+        List<Receita> receitasNoMes = receitaService.pesquisarReceitasNoMes(ano, mes);
+
+        return ResponseEntity.ok(receitasNoMes);
     }
 
     @PostMapping

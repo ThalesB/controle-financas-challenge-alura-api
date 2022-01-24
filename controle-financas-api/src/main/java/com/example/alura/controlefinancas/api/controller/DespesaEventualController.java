@@ -17,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import sun.security.krb5.internal.crypto.Des;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -43,17 +45,33 @@ public class DespesaEventualController {
     MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<List<DespesaEventual>> DespesasEventualListar(){
+    public ResponseEntity<List<DespesaEventual>> pesquisar(@RequestParam(value = "descricao", required = false) String descricao){
 
-        List<DespesaEventual> despesasEventuais = despesaEventualRepository.findAll();
+        List<DespesaEventual> despesasEventuais = despesaEventualService.pesquisar(descricao);
 
         return ResponseEntity.ok(despesasEventuais);
+    }
+
+    @GetMapping("/paginada")
+    public Page<DespesaEventual> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao,
+                                                  @RequestParam(value = "page", required = true) Integer page,
+                                                  @RequestParam(value = "size", required = true) Integer size){
+
+        return despesaEventualService.pesquisaPaginada(descricao, page, size);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DespesaEventual> findDespesaEventualById(@PathVariable Long id){
 
         return despesaEventualService.verificarDespesaEventualExistente(id);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public ResponseEntity<List<DespesaEventual>> listagemDespesasEventuaisNoMes(@PathVariable Integer ano, @PathVariable Integer mes){
+
+        List<DespesaEventual> despesaEventuaisNoMes = despesaEventualService.pesquisarDespesasEventuaisNoMes(ano, mes);
+
+        return ResponseEntity.ok(despesaEventuaisNoMes);
     }
 
     @PostMapping

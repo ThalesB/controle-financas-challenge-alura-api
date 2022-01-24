@@ -2,6 +2,7 @@ package com.example.alura.controlefinancas.api.controller;
 
 import com.example.alura.controlefinancas.api.event.RecursoCriadoEvent;
 import com.example.alura.controlefinancas.api.exceptionhandler.ControleFinancasExceptionHandler;
+import com.example.alura.controlefinancas.api.model.DespesaEventual;
 import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.repository.DespesaFixaRepository;
 import com.example.alura.controlefinancas.api.service.DespesaFixaService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,17 +41,34 @@ public class DespesaFixaController {
     MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<List<DespesaFixa>> DespesasFixasListar(){
+    public ResponseEntity<List<DespesaFixa>> pesquisar(@RequestParam(value = "descricao", required = false)String descricao){
 
-        List<DespesaFixa> despesasFixas = despesaFixaRepository.findAll();
+        List<DespesaFixa> despesasFixas = despesaFixaService.pesquisar(descricao);
 
         return ResponseEntity.ok(despesasFixas);
+    }
+
+    @GetMapping("/paginada")
+    @ResponseStatus(HttpStatus.OK)
+    public Page<DespesaFixa> pesquisaPaginada(@RequestParam(value = "descricao", required = false)String descricao,
+                                              @RequestParam(value = "page", required = true) Integer page,
+                                              @RequestParam(value = "size", required = true) Integer size){
+
+      return despesaFixaService.pesquisaPaginada(descricao, page, size);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DespesaFixa> findDespesaFixaById(@PathVariable Long id){
 
         return despesaFixaService.verificarDespesaExistente(id);
+    }
+
+    @GetMapping("/{ano}/{mes}")
+    public ResponseEntity<List<DespesaFixa>> listagemDespesasFixaNoMes(@PathVariable Integer ano, @PathVariable Integer mes){
+
+        List<DespesaFixa> despesasFixasNoMes = despesaFixaService.pesquisarDespesasFixasNoMes(ano, mes);
+
+        return ResponseEntity.ok(despesasFixasNoMes);
     }
 
     @PostMapping

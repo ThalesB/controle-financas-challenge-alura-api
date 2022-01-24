@@ -7,12 +7,17 @@ import com.example.alura.controlefinancas.api.service.exception.DespesaEventualM
 import com.example.alura.controlefinancas.api.service.exception.DespesaEventualNaoExistenteException;
 import com.example.alura.controlefinancas.api.service.exception.DespesaFixaMesmaDescricaoNoMesException;
 import com.example.alura.controlefinancas.api.service.exception.DespesaFixaNaoExistenteException;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -62,9 +67,9 @@ public class DespesaEventualService {
 
     public void verificarDescricaoEDataDespesaEventual(DespesaEventual despesaEventual){
 
-        LocalDate dataReceita = LocalDate.of(despesaEventual.getData().getYear(), despesaEventual.getData().getMonth(), despesaEventual.getData().getDayOfMonth());
-        LocalDate dataInicio = dataReceita.withDayOfMonth(1);
-        LocalDate dataFim = dataReceita.withDayOfMonth(dataReceita.lengthOfMonth());
+        LocalDate dataDespesaEventual = LocalDate.of(despesaEventual.getData().getYear(), despesaEventual.getData().getMonth(), despesaEventual.getData().getDayOfMonth());
+        LocalDate dataInicio = dataDespesaEventual.withDayOfMonth(1);
+        LocalDate dataFim = dataDespesaEventual.withDayOfMonth(dataDespesaEventual.lengthOfMonth());
 
         Optional<DespesaEventual> despesaEventualSalva = despesaEventualRepository.findByDescricaoEData(despesaEventual.getDescricao(), dataInicio, dataFim);
 
@@ -74,4 +79,25 @@ public class DespesaEventualService {
     }
 
 
+    public List<DespesaEventual> pesquisar(String descricao) {
+
+        return despesaEventualRepository.findByDescricao(descricao);
+    }
+
+    public Page<DespesaEventual> pesquisaPaginada(String descricao, Integer page, Integer size){
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        return despesaEventualRepository.findByDescricaoPaginada(descricao, pageable);
+
+    }
+
+    public List<DespesaEventual> pesquisarDespesasEventuaisNoMes(Integer ano, Integer mes) {
+
+        LocalDate dataDespesaEventual = LocalDate.of(ano,mes,1);
+        LocalDate dataInicio = dataDespesaEventual.withDayOfMonth(1);
+        LocalDate dataFim = dataDespesaEventual.withDayOfMonth(dataDespesaEventual.lengthOfMonth());
+
+        return despesaEventualRepository.findByData(dataInicio, dataFim);
+    }
 }

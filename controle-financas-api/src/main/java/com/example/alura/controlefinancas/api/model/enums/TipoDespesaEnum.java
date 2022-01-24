@@ -2,11 +2,14 @@ package com.example.alura.controlefinancas.api.model.enums;
 
 public enum TipoDespesaEnum {
 
-    MORADIA(1, "Moradia"),
-    TRANSPORTE(2, "Transporte"),
-    COMUNICACO(3, "Comunicação"),
-    LAZER(4, "Lazer"),
-    CARTAO(5, "Cartão");
+    ALIMENTACAO(1, "Alimentação"),
+    SAUDE(2, "Saúde"),
+    MORADIA(3, "Moradia"),
+    TRANSPORTE(4, "Transporte"),
+    EDUCACAO(5, "Educação"),
+    LAZER(6, "Lazer"),
+    IMPREVISTOS(7, "Imprevistos"),
+    OUTRAS(8, "Outras");
 
 
     private int id;
