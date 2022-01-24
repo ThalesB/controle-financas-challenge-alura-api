@@ -1,7 +1,7 @@
 package com.example.alura.controlefinancas.api.repository;
 
 import com.example.alura.controlefinancas.api.model.DespesaEventual;
-import com.example.alura.controlefinancas.api.model.DespesaFixa;
+import com.example.alura.controlefinancas.api.model.enums.TipoDespesaEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,11 +21,17 @@ public interface DespesaEventualRepository extends JpaRepository<DespesaEventual
     public Optional<DespesaEventual> findByDescricaoEData(@Param("descricao")String descricao, @Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
 
     @Query("select a from DespesaEventual a where (:descricao is null or a.descricao = :descricao)")
-    List<DespesaEventual> findByDescricao(@Param("descricao") String descricao);
+    public List<DespesaEventual> findByDescricao(@Param("descricao") String descricao);
 
     @Query("select a from DespesaEventual a where (:descricao is null or a.descricao = :descricao)")
-    Page<DespesaEventual> findByDescricaoPaginada(@Param("descricao")String descricao, Pageable pageable);
+    public Page<DespesaEventual> findByDescricaoPaginada(@Param("descricao")String descricao, Pageable pageable);
 
     @Query("select a from DespesaEventual a where a.data between :dataInicio and :dataFim")
-    List<DespesaEventual> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);
+    public List<DespesaEventual> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);
+
+    @Query("select sum(a.valor) from DespesaEventual a where a.data between :dataInicio and :dataFim")
+    public Double findValorTotalDespesasEventuaisPorMes(LocalDate dataInicio, LocalDate dataFim);
+
+    @Query("select sum(a.valor) from DespesaEventual a where a.tipoDespesa = :tipo and a.data between :dataInicio and :dataFim")
+    public Double findByTipoNoMes(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim, @Param("tipo") TipoDespesaEnum tipo);
 }

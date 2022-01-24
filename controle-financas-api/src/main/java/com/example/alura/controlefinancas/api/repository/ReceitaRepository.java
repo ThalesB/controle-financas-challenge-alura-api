@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +29,7 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long>{
 
     @Query("select a from Receita a where a.data between :dataInicio and :dataFim")
     List<Receita> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);
+
+    @Query("select sum(a.valor) from Receita a where a.data between :dataInicio and :dataFim")
+    BigDecimal findValorTotalReceitaPorMes(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
 }
