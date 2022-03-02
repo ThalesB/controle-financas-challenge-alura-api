@@ -19,13 +19,13 @@ public interface ReceitaRepository extends JpaRepository<Receita, Long>{
 
 
     @Query("select a from Receita a where a.descricao =:descricao and a.data between :dataInicio and :dataFim")
-    public Optional<Receita> findByDescricaoEData(@Param("descricao")String descricao, @Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
+    Optional<Receita> findByDescricaoEData(@Param("descricao")String descricao, @Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
 
-    @Query("select a from Receita a where (:descricao is null or a.descricao =: descricao)")
-    public Page<Receita> findByDescricaoPaginada(@Param("descricao")String descricao, Pageable pageable);
+    @Query("select a from Receita a where (:descricao is null or a.descricao = :descricao)")
+    Page<Receita> findByDescricaoPaginada(String descricao, Pageable pageable);
 
-    @Query("select a from Receita a where (:descricao is null or a.descricao =: descricao)")
-    public List<Receita> findByDescricao(@Param("descricao")String descricao);
+    @Query("select a from Receita a where (:descricao is null or a.descricao = :descricao)")
+    List<Receita> findByDescricao(String descricao);
 
     @Query("select a from Receita a where a.data between :dataInicio and :dataFim")
     List<Receita> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);

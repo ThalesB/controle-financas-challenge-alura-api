@@ -18,20 +18,20 @@ public interface DespesaEventualRepository extends JpaRepository<DespesaEventual
 
 
     @Query("select a from DespesaEventual a where a.descricao =:descricao and a.data between :dataInicio and :dataFim")
-    public Optional<DespesaEventual> findByDescricaoEData(@Param("descricao")String descricao, @Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
+    Optional<DespesaEventual> findByDescricaoEData(@Param("descricao")String descricao, @Param("dataInicio")LocalDate dataInicio, @Param("dataFim") LocalDate dataFim);
 
     @Query("select a from DespesaEventual a where (:descricao is null or a.descricao = :descricao)")
-    public List<DespesaEventual> findByDescricao(@Param("descricao") String descricao);
+    List<DespesaEventual> findByDescricao(@Param("descricao") String descricao);
 
     @Query("select a from DespesaEventual a where (:descricao is null or a.descricao = :descricao)")
-    public Page<DespesaEventual> findByDescricaoPaginada(@Param("descricao")String descricao, Pageable pageable);
+    Page<DespesaEventual> findByDescricaoPaginada(@Param("descricao")String descricao, Pageable pageable);
 
     @Query("select a from DespesaEventual a where a.data between :dataInicio and :dataFim")
-    public List<DespesaEventual> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);
+    List<DespesaEventual> findByData(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim);
 
     @Query("select sum(a.valor) from DespesaEventual a where a.data between :dataInicio and :dataFim")
-    public Double findValorTotalDespesasEventuaisPorMes(LocalDate dataInicio, LocalDate dataFim);
+    Double findValorTotalDespesasEventuaisPorMes(LocalDate dataInicio, LocalDate dataFim);
 
     @Query("select sum(a.valor) from DespesaEventual a where a.tipoDespesa = :tipo and a.data between :dataInicio and :dataFim")
-    public Double findByTipoNoMes(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim, @Param("tipo") TipoDespesaEnum tipo);
+    Double findByTipoNoMes(@Param("dataInicio")LocalDate dataInicio, @Param("dataFim")LocalDate dataFim, @Param("tipo") TipoDespesaEnum tipo);
 }

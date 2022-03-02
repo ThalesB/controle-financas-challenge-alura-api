@@ -32,6 +32,17 @@ public class Receita {
     @Column(name="observacao", nullable = false)
     private String observacao;
 
+    public Receita(String descricao, BigDecimal valor, LocalDate data, String observacao) {
+        this.descricao = descricao;
+        this.valor = valor;
+        this.data = data;
+        this.observacao = observacao;
+    }
+
+    public Receita() {
+
+    }
+
 
     public Long getId() {
         return id;

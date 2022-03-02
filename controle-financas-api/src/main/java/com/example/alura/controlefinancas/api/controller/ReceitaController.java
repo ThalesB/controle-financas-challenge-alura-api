@@ -2,8 +2,12 @@ package com.example.alura.controlefinancas.api.controller;
 
 import com.example.alura.controlefinancas.api.event.RecursoCriadoEvent;
 import com.example.alura.controlefinancas.api.exceptionhandler.ControleFinancasExceptionHandler;
+import com.example.alura.controlefinancas.api.model.DTO.ReceitaDetalheDto;
+import com.example.alura.controlefinancas.api.model.DTO.ReceitaDto;
+import com.example.alura.controlefinancas.api.model.DTO.ReceitaListaDto;
 import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.model.Receita;
+import com.example.alura.controlefinancas.api.model.formDTO.ReceitaCadastroFormDto;
 import com.example.alura.controlefinancas.api.repository.ReceitaRepository;
 import com.example.alura.controlefinancas.api.service.ReceitaService;
 import com.example.alura.controlefinancas.api.service.exception.ReceitaMesmaDescricaoNoMesException;
@@ -42,42 +46,38 @@ public class ReceitaController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Receita> pesquisar(@RequestParam(value = "descricao", required = false) String descricao){
+    public List<ReceitaListaDto> listarReceita(@RequestParam(value = "descricao", required = false) String descricao){
 
-        return receitaService.pesquisar(descricao);
+        return receitaService.listar(descricao);
     }
 
     @GetMapping("/paginada")
     @ResponseStatus(HttpStatus.OK)
-    public Page<Receita> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao,
-                                   @RequestParam(value = "page", required = false)Integer page,
-                                   @RequestParam(value = "size", required = false) Integer size){
+    public Page<ReceitaListaDto> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao, Pageable pageable){
 
-        return receitaService.pesquisaPaginada(descricao, page, size);
+        return receitaService.pesquisaPaginada(descricao, pageable);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Receita> findReceitaById(@PathVariable Long id){
+    public ResponseEntity<ReceitaDetalheDto> findReceitaById(@PathVariable Long id){
 
         return receitaService.verificaReceitaExistente(id);
     }
 
     @GetMapping("/{ano}/{mes}")
-    public ResponseEntity<List<Receita>> listagemReceitaNoMes(@PathVariable Integer ano, @PathVariable Integer mes){
+    public ResponseEntity<List<ReceitaListaDto>> listagemReceitaNoMes(@PathVariable Integer ano, @PathVariable Integer mes){
 
-        List<Receita> receitasNoMes = receitaService.pesquisarReceitasNoMes(ano, mes);
-
-        return ResponseEntity.ok(receitasNoMes);
+        return ResponseEntity.ok(receitaService.pesquisarReceitasNoMes(ano, mes));
     }
 
     @PostMapping
-    public ResponseEntity<Receita> cadastroReceita(@Valid @RequestBody Receita receita, HttpServletResponse response){
+    public ResponseEntity<ReceitaDto> cadastroReceita(@Valid @RequestBody ReceitaCadastroFormDto receitaFormDto, HttpServletResponse response){
 
-            Receita receitaSalva = receitaService.salvar(receita);
+            Receita receitaSalva = receitaService.salvar(receitaFormDto);
 
             publisher.publishEvent(new RecursoCriadoEvent(this, response, receitaSalva.getId()));
 
-            return ResponseEntity.status(HttpStatus.CREATED).body(receitaSalva);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ReceitaDto(receitaSalva));
     }
 
     @DeleteMapping("/{id}")
@@ -89,11 +89,11 @@ public class ReceitaController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Receita> updateReceita(@Valid @RequestBody Receita receita, @PathVariable Long id){
+    public ResponseEntity<ReceitaDto> updateReceita(@Valid @RequestBody Receita receita, @PathVariable Long id){
 
         Receita receitaSalva = receitaService.atualizar(receita, id);
 
-        return ResponseEntity.ok(receitaSalva);
+        return ResponseEntity.ok(new ReceitaDto(receitaSalva));
     }
 
     @ExceptionHandler( {ReceitaNaoExistenteException.class} )

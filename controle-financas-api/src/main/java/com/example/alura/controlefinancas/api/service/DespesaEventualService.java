@@ -1,5 +1,6 @@
 package com.example.alura.controlefinancas.api.service;
 
+import com.example.alura.controlefinancas.api.model.DTO.DespesaEventualListaDto;
 import com.example.alura.controlefinancas.api.model.DespesaEventual;
 import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.repository.DespesaEventualRepository;
@@ -79,16 +80,18 @@ public class DespesaEventualService {
     }
 
 
-    public List<DespesaEventual> pesquisar(String descricao) {
+    public List<DespesaEventualListaDto> pesquisar(String descricao) {
 
-        return despesaEventualRepository.findByDescricao(descricao);
+        List<DespesaEventual> listaDespesasEventuais = despesaEventualRepository.findByDescricao(descricao);
+
+        return DespesaEventualListaDto.converterLista(listaDespesasEventuais);
     }
 
-    public Page<DespesaEventual> pesquisaPaginada(String descricao, Integer page, Integer size){
+    public Page<DespesaEventualListaDto> pesquisaPaginada(String descricao, Pageable pageable){
 
-        Pageable pageable = PageRequest.of(page, size);
+        Page<DespesaEventual> listaDespesaEventuais = despesaEventualRepository.findByDescricaoPaginada(descricao, pageable);
 
-        return despesaEventualRepository.findByDescricaoPaginada(descricao, pageable);
+        return DespesaEventualListaDto.converterListaPaginada(listaDespesaEventuais);
 
     }
 

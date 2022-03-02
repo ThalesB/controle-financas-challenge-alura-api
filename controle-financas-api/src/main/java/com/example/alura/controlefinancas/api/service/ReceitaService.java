@@ -1,7 +1,10 @@
 package com.example.alura.controlefinancas.api.service;
 
+import com.example.alura.controlefinancas.api.model.DTO.ReceitaDetalheDto;
+import com.example.alura.controlefinancas.api.model.DTO.ReceitaListaDto;
 import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.model.Receita;
+import com.example.alura.controlefinancas.api.model.formDTO.ReceitaCadastroFormDto;
 import com.example.alura.controlefinancas.api.repository.ReceitaRepository;
 import com.example.alura.controlefinancas.api.service.exception.ReceitaMesmaDescricaoNoMesException;
 import com.example.alura.controlefinancas.api.service.exception.ReceitaNaoExistenteException;
@@ -24,14 +27,16 @@ public class ReceitaService {
     ReceitaRepository receitaRepository;
 
 
-    public ResponseEntity<Receita> verificaReceitaExistente(Long id) {
+    public ResponseEntity<ReceitaDetalheDto> verificaReceitaExistente(Long id) {
 
         Optional<Receita> receitaOptional = receitaRepository.findById(id);
 
-        return receitaOptional.isPresent() ? ResponseEntity.ok(receitaOptional.get()) : ResponseEntity.notFound().build();
+        return receitaOptional.isPresent() ? ResponseEntity.ok(new ReceitaDetalheDto(receitaOptional.get())) : ResponseEntity.notFound().build();
     }
 
-    public Receita salvar(Receita receita) {
+    public Receita salvar(ReceitaCadastroFormDto receitaFormDto) {
+
+       Receita receita = receitaFormDto.converter();
 
         verificarDescricaoEDataReceita(receita);
 
@@ -76,24 +81,30 @@ public class ReceitaService {
     }
 
 
-    public Page<Receita> pesquisaPaginada(String descricao, int page, int size) {
+    public Page<ReceitaListaDto> pesquisaPaginada(String descricao, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, size);
-
-        return receitaRepository.findByDescricaoPaginada(descricao, pageable);
+        if (descricao != null) {
+            Page<Receita> receitas = receitaRepository.findByDescricaoPaginada(descricao, pageable);
+            return ReceitaListaDto.converterListaPaginada(receitas);
+        } else {
+            Page<Receita> receitas = receitaRepository.findAll(pageable);
+            return ReceitaListaDto.converterListaPaginada(receitas);
+        }
     }
 
-    public List<Receita> pesquisar(String descricao) {
+    public List<ReceitaListaDto> listar(String descricao) {
 
-        return receitaRepository.findByDescricao(descricao);
+        List<Receita> receitas = receitaRepository.findByDescricao(descricao);
+
+        return ReceitaListaDto.converter(receitas);
     }
 
-    public List<Receita> pesquisarReceitasNoMes(Integer ano, Integer mes) {
+    public List<ReceitaListaDto> pesquisarReceitasNoMes(Integer ano, Integer mes) {
 
         LocalDate dataDespesaEventual = LocalDate.of(ano,mes,1);
         LocalDate dataInicio = dataDespesaEventual.withDayOfMonth(1);
         LocalDate dataFim = dataDespesaEventual.withDayOfMonth(dataDespesaEventual.lengthOfMonth());
 
-        return receitaRepository.findByData(dataInicio, dataFim);
+        return ReceitaListaDto.converter(receitaRepository.findByData(dataInicio, dataFim));
     }
 }

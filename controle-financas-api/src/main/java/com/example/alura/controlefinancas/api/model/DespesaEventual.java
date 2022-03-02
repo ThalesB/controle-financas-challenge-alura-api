@@ -37,6 +37,7 @@ public class DespesaEventual {
     @Enumerated(EnumType.STRING)
     private TipoDespesaEnum tipoDespesa;
 
+
     public Long getId() {
         return id;
     }

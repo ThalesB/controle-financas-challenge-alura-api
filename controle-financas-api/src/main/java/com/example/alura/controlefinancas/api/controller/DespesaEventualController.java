@@ -2,6 +2,7 @@ package com.example.alura.controlefinancas.api.controller;
 
 import com.example.alura.controlefinancas.api.event.RecursoCriadoEvent;
 import com.example.alura.controlefinancas.api.exceptionhandler.ControleFinancasExceptionHandler;
+import com.example.alura.controlefinancas.api.model.DTO.DespesaEventualListaDto;
 import com.example.alura.controlefinancas.api.model.DespesaEventual;
 import com.example.alura.controlefinancas.api.model.DespesaFixa;
 import com.example.alura.controlefinancas.api.repository.DespesaEventualRepository;
@@ -18,6 +19,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,19 +47,17 @@ public class DespesaEventualController {
     MessageSource messageSource;
 
     @GetMapping
-    public ResponseEntity<List<DespesaEventual>> pesquisar(@RequestParam(value = "descricao", required = false) String descricao){
+    public ResponseEntity<List<DespesaEventualListaDto>> pesquisar(@RequestParam(value = "descricao", required = false) String descricao){
 
-        List<DespesaEventual> despesasEventuais = despesaEventualService.pesquisar(descricao);
+        List<DespesaEventualListaDto> despesasEventuais = despesaEventualService.pesquisar(descricao);
 
         return ResponseEntity.ok(despesasEventuais);
     }
 
     @GetMapping("/paginada")
-    public Page<DespesaEventual> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao,
-                                                  @RequestParam(value = "page", required = true) Integer page,
-                                                  @RequestParam(value = "size", required = true) Integer size){
+    public Page<DespesaEventualListaDto> pesquisaPaginada(@RequestParam(value = "descricao", required = false) String descricao, Pageable pageable){
 
-        return despesaEventualService.pesquisaPaginada(descricao, page, size);
+        return despesaEventualService.pesquisaPaginada(descricao, pageable);
     }
 
     @GetMapping("/{id}")
